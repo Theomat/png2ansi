@@ -91,11 +91,11 @@ void process(struct image_data* data){
     for(int i = 0; i < data -> width; i++){
       px = &(row[i * 4]);
       if(px[3] > alpha_threshold)
-	printf("\e[48;2;%d;%d;%dm ", px[0], px[1], px[2]);
+	printf("\e[48;2;%d;%d;%dm  ", px[0], px[1], px[2]);
       else
-	printf("\e[0m ");
+	printf("\e[0m  ");
     }
-    printf("\n");
+    printf("\e[0m\n");
   }
   printf("\e[0m");
 }

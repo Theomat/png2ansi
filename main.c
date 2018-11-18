@@ -2,14 +2,30 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include "image.h"
 
-
+#define USAGE "Usage: png2ansi [-a <alpha_threshold>] <png_file>\nWhere:\n\tpng_file: is the PNG file to be converted to ANSI\n\talpha_threshold: is the minimum alpha value in the range 0-255 that a pixel must have to be colored in the output, it defaults to 127\n"
 
 static int alpha_threshold = 127;
 
 static int parse_opts(int argc, char* argv[]){
-  return 1;
+  int index = 1;
+  int opt;
+  while((opt = getopt(argc, argv, "a:")) != -1){
+    switch(opt) {
+    case 'a':
+      alpha_threshold = atoi(optarg);
+      if(alpha_threshold < 0 || alpha_threshold > 255)
+	fprintf(stderr, "png2ansi: Warning: alpha_threshold is outside of expected range (0-255)\n");
+      index += 2;
+      break;
+    default:
+      fprintf(stderr, USAGE);
+      exit(EXIT_FAILURE);
+    }
+  }
+  return index;
 }
 
 static void process(struct image_data* data){
@@ -49,8 +65,9 @@ static void process(struct image_data* data){
 int main(int argc, char* argv[]){
   int index = parse_opts(argc, argv);
   if(index == argc){
-    printf("png2ansi: No file specified");
-    return EXIT_SUCCESS;
+    fprintf(stderr, "png2ansi: Aborted: no file was specified\n");
+    fprintf(stderr, USAGE);
+    return EXIT_FAILURE;
   }
   char* source = argv[index];
   struct image_data* data = read_image(source);
